@@ -1,7 +1,26 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import { useSearchParams } from 'react-router-dom'
 
 function Products({ cart, setCart }) {
-  const [selectedCategory, setSelectedCategory] = useState('all')
+  const [searchParams, setSearchParams] = useSearchParams()
+  const categoryFromUrl = searchParams.get('category') || 'all'
+  const [selectedCategory, setSelectedCategory] = useState(categoryFromUrl)
+
+  // Update selected category when URL changes
+  useEffect(() => {
+    const categoryFromUrl = searchParams.get('category') || 'all'
+    setSelectedCategory(categoryFromUrl)
+  }, [searchParams])
+
+  // Update URL when category changes
+  const handleCategoryChange = (category) => {
+    setSelectedCategory(category)
+    if (category === 'all') {
+      setSearchParams({})
+    } else {
+      setSearchParams({ category })
+    }
+  }
 
   const products = [
     { 
@@ -97,7 +116,7 @@ function Products({ cart, setCart }) {
         {categories.map((cat) => (
           <button
             key={cat}
-            onClick={() => setSelectedCategory(cat)}
+            onClick={() => handleCategoryChange(cat)}
             className={`px-6 py-2 rounded-lg font-semibold transition ${
               selectedCategory === cat
                 ? 'bg-purple-600 text-white'
